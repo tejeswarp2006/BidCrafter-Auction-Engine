@@ -4,7 +4,7 @@
 ## Features
 - **Multi-client Model:** It can handle multiple connections(Bidders) at the same time without blocking other connections.
 - **Real-Time Bidding:** Notifies all connected bidders instantaneously when a new highest bid is placed.
-- **** Built on TCP connection for efficient and reliable data transfer for high-stake auctions.
+- **Connection-Oriented** Built on TCP connection for efficient and reliable data transfer for high-stake auctions.
 - **Session Management:** Tracks connected users and gracefully handles client disconnects or timeouts.
 ---
 
