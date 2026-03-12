@@ -17,10 +17,11 @@
 ## Prerequisites
 
 Before you begin, ensure you have met the following requirements:
-* Python 3.8 or higher installed on your system.
+* Python `3.8` or higher installed on your system.
 * A terminal or command prompt to run the server and client instances.
+* Atleast two Virtual Machines if you are running it on the same system
 
-##Contributors
+## Contributors
 - Zia Kadijah
 - Palla Tejeswar Reddy
 - Mohammed Noor
