@@ -25,4 +25,3 @@ Before you begin, ensure you have met the following requirements:
 - Zia Kadijah
 - Palla Tejeswar Reddy
 - Mohammed Noor
-## you are free to change the name and description of the repo if you guys want to!!
