@@ -172,13 +172,13 @@ This project demonstrates several important networking and systems concepts:
 
 ## Future Improvements
 
-* **Dynamic Auction Timer**
+* **Dynamic Auction Timer:**
   Introduce configurable or per-item timers so that each auction can have its own countdown instead of relying on a single fixed-duration timer.
 
-* **Scalable Connection Handling**
+* **Scalable Connection Handling:**
   Replace the current thread-per-client model with an **asynchronous event-driven architecture** using Python's `asyncio`. This would allow the server to handle a much larger number of simultaneous clients without creating a separate thread for each connection.
 
-* **External Item Configuration**
+* **External Item Configuration:**
   Move auction items out of the source code and store them in a structured file such as **CSV or JSON**. This would allow items to be easily added, removed, or modifie
 
 
