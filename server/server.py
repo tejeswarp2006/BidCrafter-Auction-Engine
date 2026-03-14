@@ -6,7 +6,7 @@ import time
 serverPort = 12000
 serverSocket = socket(AF_INET, SOCK_STREAM)
 serverSocket.bind(('', serverPort))
-serverSocket.listen(5) #we'll take 5 connections
+serverSocket.listen(5) #5 here is the max number of connections in the queue waiting to be accepted.
 print("Esmerelda is up and running!")
 
 context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
@@ -97,7 +97,6 @@ def clientHandler(connectionSocket, addr): #this function handles client connect
                     )
 
                 break  
-                      
         except:
             break
         
