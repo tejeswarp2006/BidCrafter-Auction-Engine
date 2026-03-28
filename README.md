@@ -9,14 +9,15 @@ All communication between the server and clients is **encrypted using TLS (SSL)*
 
 ## Features
 
-* **Multi-client support** using threaded server architecture
+* **Multi-client support** using asynchronous server architecture (Python's `asyncio` library)
 * **TLS-encrypted communication** using Python's `ssl` module
 * **Multiple auction items** with unique item IDs
 * **Real-time bidding updates** broadcast to all connected clients
-* **Thread-safe bidding logic** using locks to prevent race conditions
+* **Concurrency-safe bidding logic** using asynchronous locks
 * **Username system** for bidder identification
-* **Auction timer** that automatically declares winners
-* **Custom application-layer protocol**
+* **Auction timers** that automatically declare winners
+* **Dynamic item-loading from JSON**
+* **Throughput and Latency measurements**
 
 ---
 
@@ -27,9 +28,9 @@ Clients
    ↓
 Secure TCP Connection (TLS)
    ↓
-Auction Server
+Async Auction Server
    ↓
-Shared Auction State
+In-Memory Auction State
 ```
 
 Each connected client communicates with the server over a **secure TCP socket**.
@@ -48,9 +49,11 @@ BidCrafter-Auction-Engine
 │
 ├── clients/
 │   └── client.py
+│   └── load_test.py
 │
 ├── server/
-│   └── server.py
+│   └── items.json
+│   └── server_async.py
 │
 ├── .gitignore
 └── README.md
@@ -84,13 +87,13 @@ This will create the TLS certificate and private key used for encrypted communic
 Navigate to the project directory and start the server:
 
 ```
-python server/server.py
+python server/server_async.py
 ```
 
 You should see output similar to:
 
 ```
-Esmerelda is up and running!
+Esmerelda is running on port 12000!!!
 Secure connection established with ('127.0.0.1', 53212)
 TLS version: TLSv1.3
 Cipher: TLS_AES_256_GCM_SHA384
@@ -105,8 +108,12 @@ Open another terminal and run:
 ```
 python clients/client.py
 ```
+Or:
 
-You can run multiple clients simultaneously to simulate concurrent bidders.
+```
+python clients/load_test.py
+```
+Which you can to run multiple fake clients simultaneously to simulate concurrent bidders.
 
 ---
 
@@ -161,26 +168,20 @@ This ensures that auction commands and bid values cannot be intercepted or modif
 This project demonstrates several important networking and systems concepts:
 
 * TCP socket programming
-* Threaded server architecture
+* Asynchronous server architecture (`asyncio`)
 * TLS encryption
 * Application-layer protocol design
-* Concurrency control with locks
+* Concurrency control with async locks
 * Real-time event broadcasting
 * Client-server communication
+* Performance measurement
 
 ---
 
 ## Future Improvements
 
-* **Dynamic Auction Timer:**
-  Introduce configurable or per-item timers so that each auction can have its own countdown instead of relying on a single fixed-duration timer.
-
-* **Scalable Connection Handling:**
-  Replace the current thread-per-client model with an **asynchronous event-driven architecture** using Python's `asyncio`. This would allow the server to handle a much larger number of simultaneous clients without creating a separate thread for each connection.
-
-* **External Item Configuration:**
-  Move auction items out of the source code and store them in a structured file such as **CSV or JSON**. This would allow items to be easily added, removed, or modifie
-
+* Web-based Frontend
+* Persistent storage with database integration
 
 ---
 

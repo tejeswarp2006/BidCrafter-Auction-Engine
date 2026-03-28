@@ -1,0 +1,32 @@
+{
+    "1": {
+        "name": "Saleena's Soul",
+        "highest_bid": 50,
+        "highest_bidder": null,
+        "duration": 120
+    },
+    "2": {
+        "name": "Zia's 985 day Duolingo Streak",
+        "highest_bid": 100,
+        "highest_bidder": null,
+        "duration": 60
+    },
+    "3": {
+        "name": "10 CGPA",
+        "highest_bid": 1000,
+        "highest_bidder": null,
+        "duration": 30
+    },
+    "4": {
+        "name": "The Pyramids of Giza",
+        "highest_bid": 5,
+        "highest_bidder": null,
+        "duration": 50
+    },
+    "5": {
+        "name": "Sanju Samson",
+        "highest_bid": 500,
+        "highest_bidder": null,
+        "duration": 70
+    }
+}
