@@ -1,3 +1,4 @@
+#introducing 1000 fake clients to see how well esmerelda can handle pressure
 import asyncio
 import ssl
 import random
@@ -22,9 +23,6 @@ context.check_hostname = False
 context.verify_mode = ssl.CERT_NONE
 
 async def fake_client(id):
-    # This spreads the 1000 connection attempts over 3 seconds.
-    await asyncio.sleep(random.uniform(0, 3))
-    
     try:
         reader, writer = await asyncio.open_connection(
             HOST, PORT, ssl=context
@@ -51,10 +49,9 @@ async def fake_client(id):
 
         writer.close()
         await writer.wait_closed()
-        
-   
-    except Exception as e:
-        print(f"Bot {id} error: {e}")
+
+    except:
+        pass
 
 
 async def main():
