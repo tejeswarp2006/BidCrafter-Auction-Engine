@@ -1,7 +1,3 @@
-'''A small note: The older version of our server used a multi-threading model, which we have now abandoned in favour of this new asynchronous model.
-The reason for this is that our multi-threading model could only handle so many clients before it exhausted available resources, as it would have to create a thread for each client, and eventually met its end.
-This new one can now handle many more clients, as demonstrated by the load_test.py file in our clients folder.'''
-
 import asyncio 
 import ssl 
 import time
@@ -17,6 +13,23 @@ items = os.path.join(BASE_DIR,"server","items.json")
 #this is to test server throughput. FYI: throughput gets printed every 50 requests in the terminal
 request_count = 0
 start_time_metrics = time.time()
+total_latency = 0
+latency_count = 0
+
+def print_final_metrics(): #stats!
+    global request_count, start_time_metrics, total_latency, latency_count
+    
+    total_time = time.time() - start_time_metrics
+    
+    avg_throughput = request_count / total_time if total_time > 0 else 0
+    avg_latency = total_latency / latency_count if latency_count > 0 else 0
+
+    print("\nFINAL METRICS")
+    print(f"Total Requests: {request_count}")
+    print(f"Total Time: {total_time:.2f} sec")
+    print(f"Average Throughput: {avg_throughput:.2f} req/sec")
+    print(f"Average Latency: {avg_latency*1000:.2f} ms")
+    print("\n")
 
 #ssl implementation
 context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
@@ -84,17 +97,18 @@ async def handle_client(reader, writer):
     while True:
         try:
             message = (await reader.read(1024)).decode().strip()
-            #this is to measure latency of each request
+            
+            if not message:
+                break
+
             start_latency = time.time()
             global request_count 
             request_count+=1
             
-            if request_count % 50 == 0: #so basically total requests are counted and divided by total time
+            if request_count % 50 == 0:
                 elapsed = time.time() - start_time_metrics
-                print(f"Throughput: {request_count/elapsed:.2f} req/sec")
-                
-            if not message:
-                break
+                avg_throughput = request_count / elapsed
+                print(f"Average Throughput: {avg_throughput:.2f} req/sec")
             
             print(addr, "sent you a message! It reads:\n", message)
             parts = message.split()
@@ -118,11 +132,6 @@ async def handle_client(reader, writer):
                     continue
 
                 async with auction_lock: #critical section
-                    
-                    '''small theory section: critical section is the part of the code that accesses shared resources.
-                        here, the resources are highest bid and bidder. we need to ensure that no two threads access this section at the same time 
-                        so we can avoid inconsistencies in the auction state.'''
-                        
                     if item in auctions:
                         if auctions[item]["ended"]:
                             writer.write(f"\nOh no! Bidding for {auctions[item]['name']} has ended. Learn to read, silly!\n".encode())
@@ -130,7 +139,7 @@ async def handle_client(reader, writer):
                             continue
                         
                         if auctions[item]["start_time"] is None:
-                            auctions[item]["start_time"] = time.time() #starting the timer on the first bid
+                            auctions[item]["start_time"] = time.time()
 
                         if bid_amount > auctions[item]["highest_bid"]: 
                             auctions[item]["highest_bid"] = bid_amount
@@ -168,14 +177,24 @@ async def handle_client(reader, writer):
                 writer.write("Thanks for coming! I hope it was worth your time :D".encode())
                 await writer.drain()
                 break
+
             latency = time.time() - start_latency
+
+            global total_latency, latency_count
+            total_latency += latency
+            latency_count += 1
+
             print(f"Latency: {latency:.4f}s")
+
+            if latency_count % 50 == 0:
+                avg_latency = total_latency / latency_count
+                print(f"Average Latency: {avg_latency:.4f}s")
         except:
             break
         
     print(addr, " disconnected") 
     clients.discard(writer)
-    usernames.pop(writer, None) #remove the username associated with this writer if it exists 
+    usernames.pop(writer, None) 
         
     writer.close()
     try:
@@ -204,7 +223,6 @@ async def timer_task():
 
                     to_remove.append(item_id)
 
-        # remove the item after the loop
         for item_id in to_remove:
             auctions[item_id]["ended"] = True
 
@@ -212,9 +230,9 @@ async def timer_task():
         
 
 async def main():
-    server = await asyncio.start_server( #this is the asyncio way of starting a server, it takes the client handler function, host, port, and ssl context as arguments
+    server = await asyncio.start_server(
         handle_client, 
-        '0.0.0.0', #this is 0.0.0.0 because we want to accept connections from any IP address, not just localhost
+        '0.0.0.0',
         12000, 
         ssl = context
     )
@@ -222,6 +240,10 @@ async def main():
     print("Esmerelda is running on port 12000!!! <3")
     asyncio.create_task(timer_task())
     async with server:
-        await server.serve_forever() #esmerelda is doomed to a life of eternal servitude. 
+        await server.serve_forever()
         
-asyncio.run(main())
+try:
+    asyncio.run(main())
+except KeyboardInterrupt:
+    print("\nShutting down server...")
+    print_final_metrics()
